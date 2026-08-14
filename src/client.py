@@ -41,7 +41,7 @@ def get_client_data(client_id: int, num_clients: int = 3):
     )
 
 # Définition du client fédéré
-class HospitalClient(fl.client.NumPyClient):
+class SecureHospitalClient(fl.client.NumPyClient):
     def __init__(self, net, train_loader, test_loader):
         self.net = net
         self.train_loader = train_loader
@@ -58,6 +58,9 @@ class HospitalClient(fl.client.NumPyClient):
             noise_multiplier=1.2,
             max_grad_norm=1.0,
         )
+        # On calcule la "delta" pour l'hôpital, qui dépend de la taille du dataset local
+        dataset_size = len(self.train_loader.dataset)
+        self.delta = min(1 / dataset_size, 1e-3)
 
     def get_parameters(self, config):
         """Extrait les poids. Opacus ajoute une carapace '_module' qu'il faut traverser."""
@@ -82,6 +85,10 @@ class HospitalClient(fl.client.NumPyClient):
             loss = self.criterion(outputs, batch_y)
             loss.backward()
             self.optimizer.step()
+
+            epsilon = self.privacy_engine.get_epsilon(self.delta)
+            print(f"Fin d'entraînement local | Budget DP consommé : ε = {epsilon:.2f} (δ = {self.delta:.5f})")
+
             
         return self.get_parameters(config={}), len(self.train_loader.dataset), {}
 
@@ -113,5 +120,5 @@ if __name__ == "__main__":
     net = BreastCancerNet()
     train_loader, test_loader = get_client_data(client_id=args.id)
     
-    client = HospitalClient(net, train_loader, test_loader)
+    client = SecureHospitalClient(net, train_loader, test_loader)
     fl.client.start_client(server_address="127.0.0.1:8080", client=client.to_client())
