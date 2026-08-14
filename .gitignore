@@ -1,0 +1,23 @@
+#env
+venv/
+env/
+.env/
+.env
+
+#cache
+__pycache__/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+#donnees
+*.csv
+*.dat
+*.pt
+*.pth
+
+#fichiers editeurs et systeme
+.vscode/
+.DS_Store
+Thumbs.db
