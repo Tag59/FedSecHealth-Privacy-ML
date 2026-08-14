@@ -1,1 +1,1 @@
-# FedSecHealth-Privacy-ML
+Projet de recherche et d'ingénierie (Master Cybersécurité) : Architecture d'apprentissage fédéré (Federated Learning) appliquée à la santé, renforcée par de la Confidentialité Différentielle (Differential Privacy) pour contrer les attaques par inversion de gradients.
